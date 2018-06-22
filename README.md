@@ -32,6 +32,14 @@ A proof-of-concept app demonstrating Google Cloud Speech API.
 [enable_api]: https://console.cloud.google.com/flows/enableapi?apiid=speech.googleapis.com
 [auth]: https://cloud.google.com/docs/authentication/getting-started
 
+### Install SoX
+
+This is require for your Mac to read the audio files for this project
+
+```bash
+brew install sox
+```
+
 ## Getting Started
 
 Clone the repo. In your terminal:
