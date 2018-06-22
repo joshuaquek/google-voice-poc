@@ -1,0 +1,15 @@
+{
+  "name": "google-voice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "joshuaquek <“joshua.quek.fullstack@gmail.com”> (http://www.github.com/joshuaquek)",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/speech": "^1.5.0",
+    "node-record-lpcm16": "^0.3.0"
+  }
+}
