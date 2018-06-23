@@ -19,6 +19,11 @@ let createAudioFile = () => {
       resolve('output.wav')
     });
 
+    setTimeout(() => {
+      record.stop()
+      resolve('output.wav')
+    }, 10000);
+
   });
 }
 

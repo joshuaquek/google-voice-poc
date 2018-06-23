@@ -1,5 +1,5 @@
 
-# Google Cloud Speech Proof-of-concept App
+# Google Cloud Speech 
 
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
@@ -8,7 +8,7 @@
 
 A proof-of-concept app demonstrating Google Cloud Speech API.
 
-## Pre-Setup
+## Server Setup
 
 ### Before you begin
 
