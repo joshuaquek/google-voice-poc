@@ -1,7 +1,7 @@
 {
   "name": "google-voice",
   "version": "1.0.0",
-  "description": "",
+  "description": "Its a Google Cloud Speech proof of concept prototype.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/speech": "^1.5.0",
+    "end-of-stream": "^1.4.1",
     "node-record-lpcm16": "^0.3.0"
   }
 }

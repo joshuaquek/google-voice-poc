@@ -1,51 +1,69 @@
-function streamingMicRecognize(encoding, sampleRateHertz, languageCode) {
+const fs = require('fs');
 
-  // Import Modules
-  const record = require('node-record-lpcm16');
-  const { exec } = require('child_process');
-  const speech = require('@google-cloud/speech');
+let createAudioFile = () => {
+  return new Promise((resolve, reject) => {
+    const record = require('node-record-lpcm16');
+    const eos = require('end-of-stream');
 
-  // Creates a client
-  const client = new speech.SpeechClient();
-  const request = {
-    config: {
+    var file = fs.createWriteStream('output.wav', {
+      encoding: 'binary'
+    })
+
+    record.start().pipe(file)
+
+    eos(file, function (err) {
+      // this will be set to the stream instance
+      if (err) return console.log('stream had an error or closed early');
+      console.log('stream has ended', this === file);
+      record.stop()
+      resolve('output.wav')
+    });
+
+  });
+}
+
+
+function syncRecognize(filename, encoding, sampleRateHertz, languageCode) {
+  return new Promise(async (resolve, reject) => {
+    const speech = require('@google-cloud/speech');
+    const client = new speech.SpeechClient();
+
+    const config = {
       encoding: encoding,
       sampleRateHertz: sampleRateHertz,
       languageCode: languageCode,
-    },
-    interimResults: false // If you want interim results, set this to true
-  };
+    };
 
-  // Create a recognize stream
-  const recognizeStream = client
-    .streamingRecognize(request)
-    .on('error', console.error)
-    .on('data', (data) => {
-      exec('clear', function callback(error, stdout, stderr) {
-        if (data.results[0] && data.results[0].alternatives[0]) {
-          process.stdout.write(`${JSON.stringify(data.results[0].alternatives[0])}\n`)
-          recognizeStream.end()
-          streamingMicRecognize('LINEAR16', 16000, 'en-GB')
-        } else {
-          process.stdout.write(`\n\nReached transcription time limit, press Ctrl+C\n`)
-        }
-      });
-    });
+    const audio = {
+      content: fs.readFileSync(filename).toString('base64'),
+    };
 
-  // Start recording and send the microphone input to the Speech API
-  record.start({
-      sampleRateHertz: sampleRateHertz,
-      threshold: 0,
-      // Other options, see https://www.npmjs.com/package/node-record-lpcm16#options
-      verbose: false,
-      recordProgram: 'rec', // Try also "arecord" or "sox"
-      silence: '0.3'
-    })
-    .on('error', console.error)
-    .pipe(recognizeStream);
-  // [END speech_streaming_mic_recognize
+    const request = {
+      config: config,
+      audio: audio,
+    };
+
+    let data = await client.recognize(request).catch(err => reject(err))
+    const response = data[0]
+    const transcription = response.results.map(result => result.alternatives[0].transcript).join('\n')
+    resolve(transcription)
+  });
+
 }
 
-// Call the function
-streamingMicRecognize('LINEAR16', 16000, 'en-GB')
+let recordAndGetTranscription = () => {
+  return new Promise(async (resolve, reject) => {
+    console.log('----START----');
+    let filename = await createAudioFile().catch(err => reject(err))
+    let transcription = await syncRecognize(filename, 'LINEAR16', 16000, 'en-GB').catch(err => reject(err))
+    console.log('Transcription: ' + transcription)
+    resolve(transcription)
+    console.log('----DONE----');
+  });
+}
 
+let run = async () => {
+  let transcription = await recordAndGetTranscription()
+}
+
+run()
